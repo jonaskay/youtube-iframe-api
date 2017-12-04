@@ -1,7 +1,46 @@
 <link rel="import" href="../polymer/polymer-element.html">
 
 <script>
-  class YouTubeIFrameAPI extends Polymer.Element {
+
+  if (!window.YouTubeIFrame) {
+    window.YouTubeIFrame = {};
+  }
+
+  YouTubeIFrame.APILoader = {
+    require: function(src) {
+      if (!document.querySelector(`script[src="${src}"]`)) {
+        var tag = document.createElement('script');
+        tag.src = src;
+        var firstScriptTag = document.querySelector('script') || document.body;
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+    }
+  }
+
+  YouTubeIFrame.APILoaderMixin = Polymer.dedupingMixin((superClass) =>
+    class extends superClass {
+      constructor() {
+        super();
+        this._loadLibrary();
+      }
+
+      static get properties() {
+        return {
+          src: {
+            type: String,
+            value: 'https://www.youtube.com/iframe_api',
+            readOnly: true
+          }
+        }
+      }
+
+      _loadLibrary() {
+        YouTubeIFrame.APILoader.require(this.src);
+      }
+    }
+  );
+
+  class YouTubeIFrameAPI extends YouTubeIFrame.APILoaderMixin(Polymer.Element) {
     static get is() {
       return 'youtube-iframe-api';
     }
@@ -11,6 +50,7 @@
       this.dispatchEvent(new CustomEvent('load', { bubbles: true, composed: true }));
     }
   }
-
+  
   customElements.define(YouTubeIFrameAPI.is, YouTubeIFrameAPI);
+
 </script>
