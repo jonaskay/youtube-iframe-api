@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../polymer/polymer-element.html">
+  <link rel="import" href="../youtube-iframe-api.html">  
+</head>
+<body>
+  <dom-module id="demo-element">
+    <template>
+      <p id="message"></p>
+      <youtube-iframe-api 
+        on-load="_handleLoad" 
+        on-error="_handleError"></youtube-iframe-api>
+    </template>
+    <script>
+      HTMLImports.whenReady(function() {
+        class DemoElement extends Polymer.Element {
+          static get is() { 
+            return 'demo-element';
+          }
+
+          _handleLoad(event) {
+            this.$.message.innerHTML += event.target.localName + ' loaded';
+            console.log(event.target.localName + ' loaded');
+          }
+
+          _handleError(event) {
+            this.$.message.innerHTML += event.target.localName + ' error';
+            console.log(event.target.localName + ' error');
+          }
+        }
+        window.customElements.define(DemoElement.is, DemoElement);
+      });
+    </script>
+  </dom-module>
+  <demo-element></demo-element>
+</body>
+</html>

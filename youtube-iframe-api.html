@@ -1,0 +1,16 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<script>
+  class YouTubeIFrameAPI extends Polymer.Element {
+    static get is() {
+      return 'youtube-iframe-api';
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+      this.dispatchEvent(new CustomEvent('load', { bubbles: true, composed: true }));
+    }
+  }
+
+  customElements.define(YouTubeIFrameAPI.is, YouTubeIFrameAPI);
+</script>
