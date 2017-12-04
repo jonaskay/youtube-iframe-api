@@ -37,16 +37,20 @@
 
     _loadAPI() {
       if (!YouTubeIFrame.apiTag) {
-        window[this.callbackName] = this._apiLoadCallback.bind(this);
+        window[this.callbackName] = this._handleAPILoadCallback.bind(this);
         YouTubeIFrame.apiTag = document.createElement('script');
         YouTubeIFrame.apiTag.src = this.url;
+        YouTubeIFrame.apiTag.onerror = this._handleAPILoadError.bind(this);
         var firstScriptTag = document.querySelector('script') || document.body;
         firstScriptTag.parentNode.insertBefore(YouTubeIFrame.apiTag, firstScriptTag);    
       }
     }
 
-    _apiLoadCallback() {
-      YouTubeIFrame.apiReady = true;
+    _handleAPILoadError() {
+      this.dispatchEvent(new CustomEvent('api-error', { bubbles: true, composed: true }))
+    }
+
+    _handleAPILoadCallback() {
       this.dispatchEvent(new CustomEvent('api-load', { bubbles: true, composed: true }));
     }
   }
