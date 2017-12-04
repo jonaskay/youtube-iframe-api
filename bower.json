@@ -1,0 +1,23 @@
+{
+  "name": "youtube-iframe-api",
+  "authors": [
+    "Jonas Kay <jonas@nextdjs.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "polymer": "Polymer/polymer#2.0.0"
+  },
+  "dependencies": {
+    "polymer": "Polymer/polymer#2.0.0"
+  }
+}
