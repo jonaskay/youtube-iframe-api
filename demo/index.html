@@ -10,13 +10,17 @@
     <template>
       <p id="message"></p>
       <youtube-iframe-api 
-        on-load="_handleLoad" 
-        on-error="_handleError"></youtube-iframe-api>
-      <youtube-iframe-api></youtube-iframe-api>
+        on-api-load="_handleLoad" 
+        on-api-error="_handleError"></youtube-iframe-api>
+      <youtube-iframe-api on-api-load="_handleLoad"></youtube-iframe-api>
     </template>
     <script>
       HTMLImports.whenReady(function() {
         class DemoElement extends Polymer.Element {
+          constructor() {
+            super();
+          }
+
           static get is() { 
             return 'demo-element';
           }

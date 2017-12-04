@@ -1,56 +1,55 @@
 <link rel="import" href="../polymer/polymer-element.html">
 
 <script>
+  var src = 'https://www.youtube.com/iframe_api'
 
   if (!window.YouTubeIFrame) {
-    window.YouTubeIFrame = {};
+    window.YouTubeIFrame = { 
+      apiURL: src,
+      apiTag: document.querySelector(`script[src="${src}"]`)
+    };
   }
 
-  YouTubeIFrame.APILoader = {
-    require: function(src) {
-      if (!document.querySelector(`script[src="${src}"]`)) {
-        var tag = document.createElement('script');
-        tag.src = src;
-        var firstScriptTag = document.querySelector('script') || document.body;
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      }
-    }
-  }
-
-  YouTubeIFrame.APILoaderMixin = Polymer.dedupingMixin((superClass) =>
-    class extends superClass {
-      constructor() {
-        super();
-        this._loadLibrary();
-      }
-
-      static get properties() {
-        return {
-          src: {
-            type: String,
-            value: 'https://www.youtube.com/iframe_api',
-            readOnly: true
-          }
-        }
-      }
-
-      _loadLibrary() {
-        YouTubeIFrame.APILoader.require(this.src);
-      }
-    }
-  );
-
-  class YouTubeIFrameAPI extends YouTubeIFrame.APILoaderMixin(Polymer.Element) {
+  class YouTubeIFrameAPI extends Polymer.Element {
     static get is() {
       return 'youtube-iframe-api';
     }
 
+    static get properties() {
+      return {
+        url: {
+          type: String,
+          value: src,
+          readOnly: true
+        },
+        callbackName: {
+          type: String,
+          value: 'onYouTubeIframeAPIReady',
+          readOnly: true
+        }
+      }
+    }
+
     connectedCallback() {
       super.connectedCallback();
-      this.dispatchEvent(new CustomEvent('load', { bubbles: true, composed: true }));
+      this._loadAPI();
+    }
+
+    _loadAPI() {
+      if (!YouTubeIFrame.apiTag) {
+        window[this.callbackName] = this._apiLoadCallback.bind(this);
+        YouTubeIFrame.apiTag = document.createElement('script');
+        YouTubeIFrame.apiTag.src = this.url;
+        var firstScriptTag = document.querySelector('script') || document.body;
+        firstScriptTag.parentNode.insertBefore(YouTubeIFrame.apiTag, firstScriptTag);    
+      }
+    }
+
+    _apiLoadCallback() {
+      YouTubeIFrame.apiReady = true;
+      this.dispatchEvent(new CustomEvent('api-load', { bubbles: true, composed: true }));
     }
   }
-  
-  customElements.define(YouTubeIFrameAPI.is, YouTubeIFrameAPI);
 
+  customElements.define(YouTubeIFrameAPI.is, YouTubeIFrameAPI);
 </script>
