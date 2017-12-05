@@ -3,16 +3,16 @@
 <script>
   var src = 'https://www.youtube.com/iframe_api'
 
-  if (!window.YouTubeIFrame) {
-    window.YouTubeIFrame = { 
+  if (!window.YTIFrame) {
+    window.YTIFrame = { 
       apiURL: src,
       apiScript: document.querySelector(`script[src="${src}"]`)
     };
   }
 
-  class YouTubeIFrameAPI extends Polymer.Element {
+  class YTIFrameAPI extends Polymer.Element {
     static get is() {
-      return 'youtube-iframe-api';
+      return 'yt-iframe-api';
     }
 
     static get properties() {
@@ -40,7 +40,7 @@
     }
 
     _loadAPI() {
-      if (!YouTubeIFrame.apiScript) {
+      if (!YTIFrame.apiScript) {
         this._addCallbackListener();
         this._addAPIScript();
       }
@@ -65,18 +65,18 @@
     }
 
     _addAPIScript() {
-      YouTubeIFrame.apiScript = document.createElement('script');
-      YouTubeIFrame.apiScript.src = this.url;
-      YouTubeIFrame.apiScript.onerror = this._handleAPILoadError.bind(this);
+      YTIFrame.apiScript = document.createElement('script');
+      YTIFrame.apiScript.src = this.url;
+      YTIFrame.apiScript.onerror = this._handleAPILoadError.bind(this);
       var firstScriptTag = document.querySelector('script') || document.body;
-      firstScriptTag.parentNode.insertBefore(YouTubeIFrame.apiScript, firstScriptTag);    
+      firstScriptTag.parentNode.insertBefore(YTIFrame.apiScript, firstScriptTag);    
     }
 
     _removeAPIScript() {
-      YouTubeIFrame.apiScript = null;
+      YTIFrame.apiScript = null;
       document.querySelector(`script[src="${this.url}"]`).remove();
     }
   }
 
-  customElements.define(YouTubeIFrameAPI.is, YouTubeIFrameAPI);
+  customElements.define(YTIFrameAPI.is, YTIFrameAPI);
 </script>
