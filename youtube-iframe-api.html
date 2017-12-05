@@ -6,7 +6,7 @@
   if (!window.YouTubeIFrame) {
     window.YouTubeIFrame = { 
       apiURL: src,
-      apiTag: document.querySelector(`script[src="${src}"]`)
+      apiScript: document.querySelector(`script[src="${src}"]`)
     };
   }
 
@@ -36,22 +36,41 @@
     }
 
     _loadAPI() {
-      if (!YouTubeIFrame.apiTag) {
-        window[this.callbackName] = this._handleAPILoadCallback.bind(this);
-        YouTubeIFrame.apiTag = document.createElement('script');
-        YouTubeIFrame.apiTag.src = this.url;
-        YouTubeIFrame.apiTag.onerror = this._handleAPILoadError.bind(this);
-        var firstScriptTag = document.querySelector('script') || document.body;
-        firstScriptTag.parentNode.insertBefore(YouTubeIFrame.apiTag, firstScriptTag);    
+      if (!YouTubeIFrame.apiScript) {
+        this._addCallbackListener();
+        this._addAPIScript();
       }
     }
 
     _handleAPILoadError() {
       this.dispatchEvent(new CustomEvent('api-error', { bubbles: true, composed: true }))
+      this._removeCallbackListener();
+      this._removeAPIScript();
     }
 
     _handleAPILoadCallback() {
       this.dispatchEvent(new CustomEvent('api-load', { bubbles: true, composed: true }));
+    }
+
+    _addCallbackListener() {
+      window[this.callbackName] = this._handleAPILoadCallback.bind(this);
+    }
+
+    _removeCallbackListener() {
+      delete window[this.callbackName];
+    }
+
+    _addAPIScript() {
+      YouTubeIFrame.apiScript = document.createElement('script');
+      YouTubeIFrame.apiScript.src = this.url;
+      YouTubeIFrame.apiScript.onerror = this._handleAPILoadError.bind(this);
+      var firstScriptTag = document.querySelector('script') || document.body;
+      firstScriptTag.parentNode.insertBefore(YouTubeIFrame.apiScript, firstScriptTag);    
+    }
+
+    _removeAPIScript() {
+      YouTubeIFrame.apiScript = null;
+      document.querySelector(`script[src="${this.url}"]`).remove();
     }
   }
 
