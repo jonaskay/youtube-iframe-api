@@ -10,6 +10,7 @@
     <template>
       <p id="message"></p>
       <button on-click="_handleClick" disabled="[[!error]]">Reload</button>
+      <div id="player"></div>
       <youtube-iframe-api 
         id="iframe"
         on-api-load="_handleLoad" 
@@ -40,6 +41,11 @@
           _handleLoad(event) {
             this.$.message.innerHTML += event.target.localName + ' loaded';
             console.log(event.target.localName + ' loaded');
+            new event.target.api.Player(this.$.player, {
+              height: '390',
+              width: '640',
+              videoId: 'cuoZenpQveQ'
+            });
           }
 
           _handleError(event) {
