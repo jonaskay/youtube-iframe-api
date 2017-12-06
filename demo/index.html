@@ -15,8 +15,8 @@
         id="iframe"
         on-api-load="_handleLoad" 
         on-api-error="_handleError"></yt-iframe-api>
-      <yt-iframe-api></yt-iframe-api>
-      <t-iframe-api></yt-iframe-api>
+      <yt-iframe-api on-api-load="_handleLoad" on-api-error="_handleError"></yt-iframe-api>
+      <yt-iframe-api on-api-load="_handleLoad" on-api-error="_handleError"></yt-iframe-api>
     </template>
     <script>
       HTMLImports.whenReady(function() {

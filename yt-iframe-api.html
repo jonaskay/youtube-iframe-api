@@ -1,80 +1,100 @@
 <link rel="import" href="../polymer/polymer-element.html">
 
 <script>
-  var src = 'https://www.youtube.com/iframe_api'
+  (function() {
+    if (!window.YTIFrame) {
+      window.YTIFrame = {};
+    }
 
-  if (!window.YTIFrame) {
-    window.YTIFrame = { 
-      apiURL: src,
-      apiScript: document.querySelector(`script[src="${src}"]`)
-    };
-  }
+    YTIFrame.APILoaderMixin = Polymer.dedupingMixin((superClass) =>
 
-  class YTIFrameAPI extends Polymer.Element {
+      class extends superClass {      
+        connectedCallback() {
+          super.connectedCallback();
+          this._loadAPI();
+        }
+
+        _loadAPI() {
+          APILoader.require(
+            this._handleAPILoadCallback.bind(this), 
+            this._handleAPILoadError.bind(this));
+        }
+
+        _handleAPILoadCallback() {
+          this.dispatchEvent(new CustomEvent('api-load', { bubbles: true, composed: true }));
+        }
+
+        _handleAPILoadError() {
+          this.dispatchEvent(new CustomEvent('api-error', { bubbles: true, composed: true }))
+        }
+      }
+    );
+    
+    var src = 'https://www.youtube.com/iframe_api'
+    var event = 'onYouTubeIframeAPIReady'
+
+    var APILoader = {
+
+      props: {
+        script: document.querySelector(`script[src="${src}"]`),
+        notifiers: []
+      },
+
+      require: function(loadCallback, loadError) {
+        this.addNotifier(loadCallback, loadError);
+        if (window.YT) {
+          this.handleLoad();
+        } else {
+          if (!this.props.script) {
+            window[event] = this.notify.bind(this, 'success');
+            this.addScript();
+          }
+        }
+      },
+
+      addNotifier: function(loadCallback, loadError) {
+        this.props.notifiers.push({ 'success': loadCallback, 'error': loadError })
+      },      
+
+      addScript: function() {
+        this.props.script = document.createElement('script');
+        this.props.script.src = src;
+        this.props.script.onerror = this.handleError.bind(this);
+        var firstScriptTag = document.querySelector('script') || document.body;
+        firstScriptTag.parentNode.insertBefore(this.props.script, firstScriptTag);            
+      },
+
+      handleLoad: function() {
+        this.notify('success');
+      },
+
+      handleError: function() {
+        this.notify('error');
+        this.cleanup();
+      },
+
+      notify: function(key) {
+        this.props.notifiers.map(notifier => notifier[key]).forEach(function(notifyHandler) {
+          notifyHandler();
+        })
+        this.props.notifiers = [];
+      },
+
+      cleanup: function() {
+        delete window[event];
+        document.querySelector(`script[src="${src}"]`).remove();
+        this.props.script = null;
+      }
+    }
+  })();
+
+  class YTIFrameAPI extends YTIFrame.APILoaderMixin(Polymer.Element) {
     static get is() {
       return 'yt-iframe-api';
     }
 
-    static get properties() {
-      return {
-        url: {
-          type: String,
-          value: src,
-          readOnly: true
-        },
-        callbackName: {
-          type: String,
-          value: 'onYouTubeIframeAPIReady',
-          readOnly: true
-        }
-      }
-    }
-
     get api() {
       return YT;
-    }
-
-    connectedCallback() {
-      super.connectedCallback();
-      this._loadAPI();
-    }
-
-    _loadAPI() {
-      if (!YTIFrame.apiScript) {
-        this._addCallbackListener();
-        this._addAPIScript();
-      }
-    }
-
-    _handleAPILoadError() {
-      this.dispatchEvent(new CustomEvent('api-error', { bubbles: true, composed: true }))
-      this._removeCallbackListener();
-      this._removeAPIScript();
-    }
-
-    _handleAPILoadCallback() {
-      this.dispatchEvent(new CustomEvent('api-load', { bubbles: true, composed: true }));
-    }
-
-    _addCallbackListener() {
-      window[this.callbackName] = this._handleAPILoadCallback.bind(this);
-    }
-
-    _removeCallbackListener() {
-      delete window[this.callbackName];
-    }
-
-    _addAPIScript() {
-      YTIFrame.apiScript = document.createElement('script');
-      YTIFrame.apiScript.src = this.url;
-      YTIFrame.apiScript.onerror = this._handleAPILoadError.bind(this);
-      var firstScriptTag = document.querySelector('script') || document.body;
-      firstScriptTag.parentNode.insertBefore(YTIFrame.apiScript, firstScriptTag);    
-    }
-
-    _removeAPIScript() {
-      YTIFrame.apiScript = null;
-      document.querySelector(`script[src="${this.url}"]`).remove();
     }
   }
 
