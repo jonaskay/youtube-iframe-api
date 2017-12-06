@@ -1,0 +1,69 @@
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../yt-iframe-api.html">  
+
+<dom-module id="demo-element">
+
+  <template>
+    <ul id="messages"></ul>
+    <button on-click="_handleClick" disabled="[[!error]]">Reload</button>
+    <div id="player"></div>
+    <template is="dom-if" if="[[!loaded]]">Hello</template>
+    <yt-iframe-api 
+      id="iframe"
+      on-api-load="_handleLoad" 
+      on-api-error="_handleError"></yt-iframe-api>
+    <yt-iframe-api on-api-load="_handleLoad" on-api-error="_handleError"></yt-iframe-api>
+    <yt-iframe-api on-api-load="_handleLoad" on-api-error="_handleError"></yt-iframe-api>
+  </template>
+  
+  <script>
+    class DemoElement extends Polymer.Element {
+      constructor() {
+        super();
+      }
+
+      static get is() { 
+        return 'demo-element';
+      }
+
+      static get properties() {
+        return {
+          loaded: {
+            type: Boolean,
+            value: false
+          },
+          error: {
+            type: Boolean,
+            value: false
+          }
+        }
+      }
+
+      _handleLoad(event) {
+        this.$.messages.innerHTML += '<li>' + event.target.localName + ' loaded</li>';
+        console.log(event.target.localName + ' loaded');
+        new event.target.api.Player(this.$.player, {
+          height: '390',
+          width: '640',
+          videoId: 'cuoZenpQveQ'
+        });
+      }
+
+      _handleError(event) {
+        this.$.messages.innerHTML += '<li>' + event.target.localName + ' error</li>';
+        console.log(event.target.localName + ' error');
+        this.error = true;
+      }
+
+      _handleClick(event) {
+        this.error = false;
+        this.$.iframe._loadAPI();
+      }
+    }
+    window.customElements.define(DemoElement.is, DemoElement);
+  </script>
+
+</dom-module>
+
+<dom-module id="demo-element">
+  </dom-module>

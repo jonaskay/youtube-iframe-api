@@ -2,67 +2,9 @@
 <html>
 <head>
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../../polymer/polymer-element.html">
-  <link rel="import" href="../yt-iframe-api.html">  
+  <link rel="import" href="demo-element.html">    
 </head>
 <body>
-  <dom-module id="demo-element">
-    <template>
-      <p id="message"></p>
-      <button on-click="_handleClick" disabled="[[!error]]">Reload</button>
-      <div id="player"></div>
-      <yt-iframe-api 
-        id="iframe"
-        on-api-load="_handleLoad" 
-        on-api-error="_handleError"></yt-iframe-api>
-      <yt-iframe-api on-api-load="_handleLoad" on-api-error="_handleError"></yt-iframe-api>
-      <yt-iframe-api on-api-load="_handleLoad" on-api-error="_handleError"></yt-iframe-api>
-    </template>
-    <script>
-      HTMLImports.whenReady(function() {
-        class DemoElement extends Polymer.Element {
-          constructor() {
-            super();
-          }
-
-          static get is() { 
-            return 'demo-element';
-          }
-
-          static get properties() {
-            return {
-              error: {
-                type: Boolean,
-                value: false
-              }
-            }
-          }
-
-          _handleLoad(event) {
-            this.$.message.innerHTML += event.target.localName + ' loaded';
-            console.log(event.target.localName + ' loaded');
-            new event.target.api.Player(this.$.player, {
-              height: '390',
-              width: '640',
-              videoId: 'cuoZenpQveQ'
-            });
-          }
-
-          _handleError(event) {
-            this.$.message.innerHTML += event.target.localName + ' error';
-            console.log(event.target.localName + ' error');
-            this.error = true;
-          }
-
-          _handleClick(event) {
-            this.error = false;
-            this.$.iframe._loadAPI();
-          }
-        }
-        window.customElements.define(DemoElement.is, DemoElement);
-      });
-    </script>
-  </dom-module>
   <demo-element></demo-element>
 </body>
 </html>
